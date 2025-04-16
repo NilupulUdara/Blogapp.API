@@ -1,7 +1,9 @@
 using AutoMapper;
+using Blogapp.API.CustomActionFilter;
 using Blogapp.API.Domain.DTO;
 using Blogapp.API.Domain.Model;
 using Blogapp.API.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
@@ -30,6 +32,7 @@ namespace Blogapp.API.Controller
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var post = await postRepository.GetByIdAsync(id);
@@ -43,6 +46,8 @@ namespace Blogapp.API.Controller
         }
 
         [HttpPost]
+        [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddPostRequestDto addPostRequestDto)
         {
             var postDomain = mapper.Map<Post>(addPostRequestDto);
@@ -56,6 +61,8 @@ namespace Blogapp.API.Controller
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdatePostDto updatePostDto)
         {
             var postDomain = mapper.Map<Post>(updatePostDto);
@@ -72,6 +79,7 @@ namespace Blogapp.API.Controller
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var post = await postRepository.DeleteAsync(id);
